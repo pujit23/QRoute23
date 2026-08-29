@@ -4,8 +4,16 @@ __pycache__/
 !demo_stops.csv
 !demo_stops_40.csv
 .env
+.env.local
+.env.*.local
+!.env.example
+.streamlit/secrets.toml
+!.streamlit/secrets.toml.example
 venv/
 node_modules/
 frontend/node_modules/
 frontend/dist/
+outputs/
+*.pem
+*.key
 .DS_Store
