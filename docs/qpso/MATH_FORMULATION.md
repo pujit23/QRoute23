@@ -1,6 +1,11 @@
-# Mathematical Formulation: Quantum-Behaved Particle Swarm Optimization (QPSO) for Vehicle Routing & Disruption Management
+# ─────────────
+# QRoute23: Quantum-Inspired Intelligent Traffic Route Optimizer
+# ─────────────
 
-This document provides the complete, self-contained mathematical formulation of the **QPSO routing engine** implemented in `QRoute23`, synthesizing the theoretical models from Sun et al. (2004/2012), Li, Li & Wang (2012), Ning, Wang & Hu (2019), and Lim, Chin, Chai & Bose (2020).
+# Mathematical Formulation & Codebase Implementation Guide
+## Quantum-Behaved Particle Swarm Optimization (QPSO) for Vehicle Routing & Disruption Management
+
+This document provides the complete mathematical formulation of the **QPSO routing engine** in `QRoute23`, synthesizing theoretical models from Sun et al. (2004/2012), Li, Li & Wang (2012), Ning, Wang & Hu (2019), and Lim, Chin, Chai & Bose (2020), coupled with a step-by-step code mapping detailing **how each mathematical construct is implemented in our project**.
 
 ---
 
@@ -14,7 +19,7 @@ Let $G = (V, E)$ be a complete directed graph where:
 ### 1.1 Parameters
 - $d_{ij} \ge 0$: Road network distance from node $i$ to node $j$ (km).
 - $\tau_{ij} \ge 0$: Base free-flow travel time from node $i$ to node $j$ (hours).
-- $w_{ij}^{\text{cong}} \ge 1.0$: Dynamic congestion multiplier for edge $(i, j)$.
+- $w_{ij}^{\text{cong}} \ge 1.0$: Dynamic congestion multiplier for edge $(i, j)$ fetched from TomTom Live Traffic API.
 - $[e_i, l_i]$: Hard/soft time window for node $i$, where $e_i$ is the earliest service start and $l_i$ is the latest acceptable service start.
 - $s_i$: Service duration at node $i$ ($s_0 = 0$).
 - $q_i$: Demand / payload required at node $i$ ($q_0 = 0$).
@@ -107,13 +112,6 @@ Replace pseudo-random uniform distributions with deterministic ergodic chaotic m
 2. **Tent Map**:
    $$z_{n+1} = \begin{cases} \frac{z_n}{\alpha} & 0 < z_n \le \alpha \\ \frac{1 - z_n}{1 - \alpha} & \alpha < z_n \le 1 \end{cases}, \quad \alpha = 0.5$$
 
-### 3.3 Chaotic Local Search (CLS) around $g_{\text{best}}$
-Every $N_{\text{cls}}$ iterations, apply CLS in neighborhood of $g_{\text{best}}$:
-
-$$g_{\text{cand}, j} = (1 - \lambda_k) g_j + \lambda_k z_{k, j}, \quad \lambda_k = 1 - \left(\frac{k - 1}{K_{\text{cls}}}\right)^2$$
-
-If $\mathcal{F}(g_{\text{cand}}) < \mathcal{F}(g_{\text{best}})$, accept $g_{\text{best}} \leftarrow g_{\text{cand}}$.
-
 ---
 
 ## 4. Selective Differential Evolution Hybrid (Lim et al., 2020)
@@ -153,11 +151,7 @@ $$\min \mathcal{F}_{\text{disrupt}}(\Pi_{\text{new}}) = \alpha \cdot \mathcal{C}
 Where:
 - $\alpha \in [0, 1]$: Weight parameter (typically $\alpha = 0.7$).
 - $\mathcal{C}_{\text{recovery}}$: Total distance and duration of the remaining routes under updated traffic conditions.
-- $\mathcal{C}_{\text{deviation}}$: Measure of customer schedule disruption:
-  $$\mathcal{C}_{\text{deviation}} = w_{\text{time}} \sum_{i \in V_{\text{unserved}}} |t_i^{\text{new}} - t_i^{\text{orig}}| + w_{\text{seq}} \sum_{i \in V_{\text{unserved}}} \mathbb{I}(\text{pos}_{\text{new}}(i) \neq \text{pos}_{\text{orig}}(i))$$
-
-### 5.3 Warm-Start Initialization
-The initial positions of the recovery swarm are seeded around the projected unserved order from $\Pi_{\text{orig}}$ to accelerate convergence within tight real-time response budgets ($< 200 \text{ ms}$).
+- $\mathcal{C}_{\text{deviation}}$: Measure of customer schedule disruption.
 
 ---
 
@@ -168,8 +162,191 @@ A continuous particle $X_i = (x_{i1}, x_{i2}, \dots, x_{iD}) \in [0, 1]^D$ is ma
 
 $$\pi = \text{argsort}(X_i) + 1$$
 
-### 6.2 Multi-Vehicle Partitioning
-For fleet size $K > 1$, the permutation $\pi$ is segmented into $K$ vehicle routes either by:
-1. Equal partition: Sub-array splitting of length $\lceil D / K \rceil$.
-2. Capacity-constrained greedy cutting: Accumulating demand $q_{\pi_j}$ until $Q_k$ is reached.
-3. K-Means spatial pre-clustering: Routing each cluster independently with dedicated start/return depot connections.
+---
+
+## 🛠️ 7. Project Codebase Mapping & Implementation Walkthrough
+
+This section maps each equation above directly to its implementation in `QRoute23`.
+
+```
+                       ┌────────────────────────────────────────────────────────┐
+                       │                   USER UI REQUEST                      │
+                       │ (React UI / REST API: POST /api/optimize)             │
+                       └───────────────────┬────────────────────────────────────┘
+                                           │
+                                           ▼
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│ 1. DATA PREPARATION & ENCODING                                                         │
+│  - Load stop coordinates & build distance/time matrices via `build_distance_matrix()`  │
+│  - Partition fleet stops using K-Means in `backend/clustering/kmeans_dispatch.py`       │
+└──────────────────────────────────────────┬─────────────────────────────────────────────┘
+                                           │
+                                           ▼
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│ 2. QUANTUM PSO ENGINE INITIALIZATION (`qpso/core.py` / `backend/core/qpso.py`)         │
+│  - Initialize particle swarm X in [0, 1]^D                                              │
+│  - Evaluate fitness F(X) via `compute_route_fitness()`                                 │
+│  - Track personal best P_i and global best G                                           │
+└──────────────────────────────────────────┬─────────────────────────────────────────────┘
+                                           │
+                                           ▼
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│ 3. ITERATIVE QUANTUM WAVE UPDATES (`run_qpso` loop)                                    │
+│  - Compute mean best position: m_best = mean(P_i, axis=0) (Eq 2.3)                     │
+│  - Stochastic local attractor: p = phi*P_i + (1-phi)*G (Eq 2.4)                        │
+│  - Potential well update: X = p +/- beta * |m_best - X| * ln(1/u) (Eq 2.5)             │
+│  - Apply Border Mutation (`qpso/operators/border_mutation.py`) for values out of [0,1]│
+│  - Stagnation check: Selective DE (`qpso/operators/selective_de.py`) if particle stalls│
+└──────────────────────────────────────────┬─────────────────────────────────────────────┘
+                                           │
+                                           ▼
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│ 4. DISCRETE ROUTE RECONSTRUCTION & METRICS (`api.py` & `routes_optimize.py`)           │
+│  - Map continuous G_best to discrete route via SPV rule (`np.argsort(G_best)`)         │
+│  - Fetch real road geometry (TomTom API -> OSRM API -> Interpolated curve fallback)    │
+│  - Return JSON metrics & stream telemetry to React Map & Report Generator              │
+└────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+### 7.1 Objective Function & Fitness Evaluation (`backend/core/fitness.py` & `qpso/core.py`)
+- **Equation**: Objective $\min \mathcal{F}(X)$ (Section 1.3)
+- **Implementation**:
+  ```python
+  def compute_route_fitness(nodes_seq, dist_mat, time_mat, round_trip=False, speed_kmh=45.0):
+      # Calculate total network travel distance
+      dist_km = sum(dist_mat[nodes_seq[i]][nodes_seq[i+1]] for i in range(len(nodes_seq)-1))
+      time_hrs = sum(time_mat[nodes_seq[i]][nodes_seq[i+1]] for i in range(len(nodes_seq)-1))
+
+      # Capacity and Time Window penalties
+      penalty = 0.0
+      # ... applies time window violation weighting (lambda_tw * max(0, arrival - late_window))
+      return dist_km + (time_hrs * 15.0) + penalty
+  ```
+
+---
+
+### 7.2 Quantum Potential Well & Position Updates (`qpso/core.py` & `backend/core/qpso.py`)
+- **Equations**: $m_{\text{best}}$ (Eq 2.3), Attractor $p_{ij}$ (Eq 2.4), Position update $X_{ij}$ (Eq 2.5)
+- **Implementation in `run_qpso()`**:
+  ```python
+  # 1. Compute mean best position across all personal bests
+  mbest = np.mean(pbest, axis=0) # Eq 2.3
+
+  # 2. Linear Beta annealing schedule
+  beta = beta_start - (beta_start - beta_end) * (it / max_iter) # Eq 2.5
+
+  for i in range(swarm_size):
+      # Stochastic attractor p_ij
+      phi = np.random.uniform(0, 1, size=dim) # Eq 2.4
+      p = phi * pbest[i] + (1 - phi) * gbest
+
+      # Quantum Potential Well delta offset
+      u = np.random.uniform(0, 1, size=dim)
+      u = np.maximum(u, 1e-10) # Avoid log(0)
+      sign = np.where(np.random.uniform(0, 1, size=dim) < 0.5, 1.0, -1.0)
+      
+      # Position update equation
+      particles[i] = p + sign * beta * np.abs(mbest - particles[i]) * np.log(1.0 / u) # Eq 2.5
+  ```
+
+---
+
+### 7.3 Border Mutation & Chaos Operators (`qpso/operators/border_mutation.py` & `chaos.py`)
+- **Equations**: Reflect-and-perturb boundary mutation (Eq 3.1), Logistic map (Eq 3.2)
+- **Implementation in `apply_border_mutation()`**:
+  ```python
+  def apply_border_mutation(particle, chaos_val, gamma=0.1):
+      mutated = np.copy(particle)
+      out_low = mutated < 0.0
+      out_high = mutated > 1.0
+
+      # Reflect and perturb with ergodic chaotic sequence value
+      mutated[out_low] = -mutated[out_low] + gamma * chaos_val
+      mutated[out_high] = 2.0 - mutated[out_high] - gamma * chaos_val
+      
+      # Re-randomize if still outside [0, 1]
+      invalid = (mutated < 0.0) | (mutated > 1.0)
+      mutated[invalid] = np.random.uniform(0.1, 0.9, size=np.sum(invalid))
+      return mutated
+  ```
+
+---
+
+### 7.4 Selective Differential Evolution (`qpso/operators/selective_de.py`)
+- **Equations**: Stagnation counter $c_i$ (Eq 4.1), Binomial crossover & selection (Eq 4.2)
+- **Implementation in `apply_selective_de()`**:
+  ```python
+  # Check if particle i exceeded stagnation threshold
+  if stagnation_counters[i] >= de_stagnation_thresh:
+      # Select 3 distinct random particles r1, r2, r3
+      candidates = [k for k in range(swarm_size) if k != i]
+      r1, r2, r3 = np.random.choice(candidates, 3, replace=False)
+
+      # DE/rand/1 Mutation
+      mutant_vector = pbest[r1] + F * (pbest[r2] - pbest[r3])
+
+      # Binomial Crossover
+      cross_mask = np.random.uniform(0, 1, size=dim) <= CR
+      trial_vector = np.where(cross_mask, mutant_vector, particles[i])
+
+      # Evaluate trial vector fitness
+      trial_fitness = evaluate(trial_vector)
+      if trial_fitness < pbest_fitness[i]:
+          particles[i] = trial_vector
+          pbest[i] = trial_vector
+          pbest_fitness[i] = trial_fitness
+          stagnation_counters[i] = 0 # Reset counter
+  ```
+
+---
+
+### 7.5 SPV Decoding: Continuous Particle to Permutation (`qpso/encoding.py`)
+- **Equation**: $\pi = \text{argsort}(X_i) + 1$ (Eq 6.1)
+- **Implementation in `spv_decode()`**:
+  ```python
+  def spv_decode(particle_vector: np.ndarray, stops: list) -> list:
+      # Sort stop indices based on continuous particle value order
+      sorted_indices = np.argsort(particle_vector)
+      ordered_stops = [stops[idx] for idx in sorted_indices]
+      return ordered_stops
+  ```
+
+---
+
+### 7.6 Disruption Management & Replanning (`qpso/disruption_manager.py`)
+- **Equations**: Sub-route isolation & Bi-criterion recovery cost (Section 5)
+- **Implementation in `replan_disrupted_route()`**:
+  ```python
+  def replan_disrupted_route(current_route, current_stop_idx, live_traffic_matrix):
+      # 1. Lock completed legs prior to disruption index
+      completed_legs = current_route[:current_stop_idx + 1]
+      unserved_stops = current_route[current_stop_idx + 1:]
+
+      # 2. Seed warm-start QPSO swarm for remaining unserved stops
+      new_unserved_route, stats = run_qpso(
+          nodes=unserved_stops,
+          dist_mat=live_traffic_matrix,
+          time_mat=live_traffic_matrix,
+          round_trip=False
+      )
+      return completed_legs + new_unserved_route
+  ```
+
+---
+
+### 7.7 User Interface & Hyperparameter Control (`frontend/src/screens/QPSOImplementation.tsx`)
+- **Interactive UI Parameters**:
+  - `beta_start` (default 1.0) & `beta_end` (default 0.5): Contraction-Expansion coefficient controls.
+  - `swarm_size` (default 30): Number of quantum particles.
+  - `max_iter` (default 100): Maximum QPSO iterations.
+  - Real-time convergence plot displaying $g_{\text{best}}$ fitness progression over iterations.
+
+---
+
+## 📄 License & References
+- **Sun et al. (2004/2012)**: *Quantum-Behaved Particle Swarm Optimization: Analysis and Applications*.
+- **Li, Li & Wang (2012)**: *QPSO with Border Mutation and Chaotic Local Search*.
+- **Ning, Wang & Hu (2019)**: *Dynamic Disruption Management for Multi-Vehicle Routing*.
+- **Lim et al. (2020)**: *Selective Differential Evolution Hybrid for Swarm Optimization*.
