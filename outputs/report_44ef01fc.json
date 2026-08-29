@@ -1,0 +1,82 @@
+{
+  "metadata": {
+    "generated_at": "2026-08-29T19:22:59.509749+00:00",
+    "algorithm": "QPSO-VRP",
+    "n_vehicles": 1,
+    "n_stops": 1,
+    "data_source": "fallback",
+    "use_case": "generic"
+  },
+  "summary": {
+    "total_distance_km": 1517.9,
+    "total_time_hours": 17.85,
+    "total_time_minutes": 1071.2,
+    "time_saved_hrs": 9.5,
+    "co2_reduction_kg": 45.5,
+    "fuel_liters": 126.5,
+    "estimated_fuel_cost": 12143.0,
+    "estimated_fuel_cost_inr": 12143.0,
+    "traffic_delay_minutes": null,
+    "on_time_rate_pct": 0.0
+  },
+  "vehicle_routes": [
+    {
+      "vehicle_id": 1,
+      "stops": [
+        {
+          "sequence": 1,
+          "name": "Mumbai",
+          "coords": [
+            19.054999,
+            72.8692035
+          ],
+          "arrival_time_hours": 8.0,
+          "time_window": null,
+          "on_time": null,
+          "distance_from_previous_km": 0.0,
+          "leg_traffic_level": "unknown"
+        },
+        {
+          "sequence": 2,
+          "name": "Varanasi",
+          "coords": [
+            25.3356491,
+            83.0076292
+          ],
+          "arrival_time_hours": 39.37,
+          "time_window": [
+            8.0,
+            18.0
+          ],
+          "on_time": false,
+          "distance_from_previous_km": 1568.57,
+          "leg_traffic_level": "unknown"
+        }
+      ],
+      "vehicle_distance_km": 1517.9,
+      "vehicle_time_minutes": 1071.2,
+      "vehicle_time_hours": 17.85
+    }
+  ],
+  "traffic_analysis": {
+    "high_congestion_segments": 0,
+    "medium_congestion_segments": 0,
+    "low_congestion_segments": 0,
+    "worst_segments": [],
+    "note": "Fallback free-flow traffic model used. Figures assume ideal road conditions."
+  },
+  "optimization_performance": {
+    "iterations_run": 100,
+    "final_cost": 65996.5,
+    "initial_cost": 65996.5,
+    "convergence_rate": null,
+    "tunneling_events": 0,
+    "runtime_seconds": 1.0749000000000002,
+    "vs_baseline": null
+  },
+  "recommendations": [
+    "Total distance, time, and cost figures above summarize this specific optimization run and are based on the data source noted in metadata.",
+    "Compare the optimization_performance section across repeated runs to gauge consistency of the solver on your data.",
+    "Data source for this report: fallback traffic data, as noted in metadata.data_source. Fallback-mode figures assume free-flow conditions and will understate real-world delay."
+  ]
+}

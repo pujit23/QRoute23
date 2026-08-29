@@ -1,0 +1,76 @@
+{
+  "metadata": {
+    "generated_at": "2026-08-28T16:59:29.659646+00:00",
+    "algorithm": "QPSO-VRP",
+    "n_vehicles": 1,
+    "n_stops": 1,
+    "data_source": "fallback",
+    "use_case": "generic"
+  },
+  "summary": {
+    "total_distance_km": 676.55,
+    "total_time_hours": 13.53,
+    "estimated_fuel_cost": 5412.4,
+    "traffic_delay_minutes": null,
+    "on_time_rate_pct": 0.0
+  },
+  "vehicle_routes": [
+    {
+      "vehicle_id": 1,
+      "stops": [
+        {
+          "sequence": 1,
+          "name": "Ahmedabad",
+          "coords": [
+            23.0215374,
+            72.5800568
+          ],
+          "arrival_time_hours": 8.0,
+          "time_window": null,
+          "on_time": null,
+          "distance_from_previous_km": 0.0,
+          "leg_traffic_level": "unknown"
+        },
+        {
+          "sequence": 2,
+          "name": "Jaipur",
+          "coords": [
+            26.9154576,
+            75.8189817
+          ],
+          "arrival_time_hours": 21.53,
+          "time_window": [
+            8.0,
+            18.0
+          ],
+          "on_time": false,
+          "distance_from_previous_km": 676.55,
+          "leg_traffic_level": "unknown"
+        }
+      ],
+      "vehicle_distance_km": 676.55,
+      "vehicle_time_hours": 13.53
+    }
+  ],
+  "traffic_analysis": {
+    "high_congestion_segments": 0,
+    "medium_congestion_segments": 0,
+    "low_congestion_segments": 0,
+    "worst_segments": [],
+    "note": "Fallback free-flow traffic model used. Figures assume ideal road conditions."
+  },
+  "optimization_performance": {
+    "iterations_run": 100,
+    "final_cost": 11405.16,
+    "initial_cost": 11405.16,
+    "convergence_rate": null,
+    "tunneling_events": 0,
+    "runtime_seconds": 1.0272999999999999,
+    "vs_baseline": null
+  },
+  "recommendations": [
+    "Total distance, time, and cost figures above summarize this specific optimization run and are based on the data source noted in metadata.",
+    "Compare the optimization_performance section across repeated runs to gauge consistency of the solver on your data.",
+    "Data source for this report: fallback traffic data, as noted in metadata.data_source. Fallback-mode figures assume free-flow conditions and will understate real-world delay."
+  ]
+}

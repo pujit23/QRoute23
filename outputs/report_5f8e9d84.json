@@ -1,0 +1,82 @@
+{
+  "metadata": {
+    "generated_at": "2026-08-29T19:19:12.092537+00:00",
+    "algorithm": "QPSO-VRP",
+    "n_vehicles": 1,
+    "n_stops": 1,
+    "data_source": "fallback",
+    "use_case": "generic"
+  },
+  "summary": {
+    "total_distance_km": 2.2,
+    "total_time_hours": 0.07,
+    "total_time_minutes": 4.2,
+    "time_saved_hrs": 0.0,
+    "co2_reduction_kg": 0.1,
+    "fuel_liters": 0.2,
+    "estimated_fuel_cost": 17.0,
+    "estimated_fuel_cost_inr": 17.0,
+    "traffic_delay_minutes": null,
+    "on_time_rate_pct": 100.0
+  },
+  "vehicle_routes": [
+    {
+      "vehicle_id": 1,
+      "stops": [
+        {
+          "sequence": 1,
+          "name": "Empire State Building, NY",
+          "coords": [
+            40.748817,
+            -73.985428
+          ],
+          "arrival_time_hours": 8.0,
+          "time_window": null,
+          "on_time": null,
+          "distance_from_previous_km": 0.0,
+          "leg_traffic_level": "unknown"
+        },
+        {
+          "sequence": 2,
+          "name": "Times Square, NY",
+          "coords": [
+            40.758,
+            -73.9855
+          ],
+          "arrival_time_hours": 8.03,
+          "time_window": [
+            8.0,
+            18.0
+          ],
+          "on_time": true,
+          "distance_from_previous_km": 1.27,
+          "leg_traffic_level": "unknown"
+        }
+      ],
+      "vehicle_distance_km": 2.2,
+      "vehicle_time_minutes": 4.2,
+      "vehicle_time_hours": 0.07
+    }
+  ],
+  "traffic_analysis": {
+    "high_congestion_segments": 0,
+    "medium_congestion_segments": 0,
+    "low_congestion_segments": 0,
+    "worst_segments": [],
+    "note": "Fallback free-flow traffic model used. Figures assume ideal road conditions."
+  },
+  "optimization_performance": {
+    "iterations_run": 100,
+    "final_cost": 1.53,
+    "initial_cost": 1.53,
+    "convergence_rate": null,
+    "tunneling_events": 0,
+    "runtime_seconds": 1.6262,
+    "vs_baseline": null
+  },
+  "recommendations": [
+    "Total distance, time, and cost figures above summarize this specific optimization run and are based on the data source noted in metadata.",
+    "Compare the optimization_performance section across repeated runs to gauge consistency of the solver on your data.",
+    "Data source for this report: fallback traffic data, as noted in metadata.data_source. Fallback-mode figures assume free-flow conditions and will understate real-world delay."
+  ]
+}
