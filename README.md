@@ -74,10 +74,10 @@ pip install -r requirements.txt
 Runs both the REST API backend and the pre-built React frontend from a single web server:
 
 ```bash
-python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload
+python -m uvicorn backend.main:app --port 8000 --reload
 ```
-- **Web Application**: [http://127.0.0.1:8000](http://127.0.0.1:8000)
-- **Interactive API Documentation (Swagger)**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+- **Web Application**: Accessible at Port `8000` (Root `/` endpoint)
+- **Interactive API Documentation (Swagger)**: Accessible at Port `8000` (`/docs` endpoint)
 
 ---
 
@@ -88,7 +88,7 @@ cd frontend
 npm install
 npm run dev
 ```
-- Access Vite UI at: [http://localhost:5173](http://localhost:5173)
+- **Vite Development UI**: Accessible at Port `5173`
 
 ---
 
@@ -97,7 +97,7 @@ npm run dev
 ```bash
 python -m streamlit run main.py --server.port=8501
 ```
-- Access Streamlit UI at: [http://localhost:8501](http://localhost:8501)
+- **Streamlit Analytics UI**: Accessible at Port `8501`
 
 ---
 
