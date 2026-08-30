@@ -21,8 +21,8 @@ export const LiveSimulationControl: React.FC<LiveSimulationProps> = ({
 }) => {
   const [selectedPreset, setSelectedPreset] = useState<string>('manhattan-core');
   const [destinationLocation, setDestinationLocation] = useState<{ name: string; coords: [number, number] }>({
-    name: 'Times Square, NY',
-    coords: [40.7580, -73.9855]
+    name: 'New Delhi, Delhi, India',
+    coords: [28.6139, 77.2090]
   });
   const [vehicleCount, setVehicleCount] = useState<number>(1);
   const [roundTrip] = useState<boolean>(false);

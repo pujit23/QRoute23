@@ -11,8 +11,8 @@ export function App() {
   const [currentTab, setCurrentTab] = useState<string>('dashboard');
 
   const [startLocation, setStartLocation] = useState<{ name: string; coords: [number, number] }>({
-    name: 'Empire State Building, NY',
-    coords: [40.748817, -73.985428]
+    name: 'Mumbai, Maharashtra, India',
+    coords: [19.0760, 72.8777]
   });
 
   const [qpsoParams, setQpsoParams] = useState({
