@@ -283,3 +283,49 @@ def get_network_health():
         "summary": summary,
         "cities": cities
     }
+
+@router.get("/report/{run_id}")
+def get_report_data(run_id: str, use_case: str = "generic"):
+    from report_generator import generate_report_data
+    cache_item = RUN_CACHE.get(run_id)
+    if not cache_item:
+        start_node, stops_data = load_preset_stops("manhattan-core")
+        routes_data = [[start_node] + stops_data]
+        stats_data = {"history": [100.0, 50.0], "tunnels": 2}
+        live_metrics = None
+    else:
+        start_node = cache_item["start_node"]
+        stops_data = cache_item["stops_data"]
+        result = cache_item["result"]
+        routes_data = [[{"name": s["name"], "coords": tuple(s["coords"])} for s in r.get("stops", [])] for r in result.get("routes", [])]
+        stats_data = result.get("telemetry", {})
+        live_metrics = result.get("metrics", {})
+        
+    return generate_report_data(
+        start_node=start_node,
+        stops_data=stops_data,
+        routes=routes_data,
+        stats=stats_data,
+        use_case=use_case,
+        live_metrics=live_metrics
+    )
+
+@router.get("/report/{run_id}/download")
+def download_report(run_id: str, format: str = "pdf", use_case: str = "generic"):
+    import tempfile
+    from report_generator import generate_report_data, export_report_json, export_report_pdf
+    report_dict = get_report_data(run_id, use_case)
+    
+    tmp_dir = tempfile.gettempdir()
+    if format.lower() == "json":
+        file_path = os.path.join(tmp_dir, f"route_report_{run_id}.json")
+        export_report_json(report_dict, file_path)
+        return FileResponse(file_path, filename=f"route_report_{run_id}.json", media_type="application/json")
+    else:
+        file_path = os.path.join(tmp_dir, f"route_report_{run_id}.pdf")
+        export_report_pdf(report_dict, file_path)
+        if os.path.exists(file_path):
+            return FileResponse(file_path, filename=f"route_report_{run_id}.pdf", media_type="application/pdf")
+        else:
+            raise HTTPException(status_code=500, detail="Failed to render PDF report")
+
