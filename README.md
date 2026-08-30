@@ -1,4 +1,4 @@
-# ⚡ QRoute23: Quantum-Inspired Intelligent Traffic Route Optimizer
+#  QRoute23: Quantum-Inspired Intelligent Traffic Route Optimizer
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-orange.svg)](LICENSE)
 [![Python 3.12](https://img.shields.io/badge/Python-3.12+-blue.svg)](https://www.python.org/)
